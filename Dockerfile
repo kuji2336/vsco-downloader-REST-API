@@ -1,20 +1,17 @@
-# Dockerfile with VSCO Downloader GUI
-# author: Micha Birklbauer
-# version: 1.0.1
+FROM python:3.12-slim
 
-FROM python:3.12.0
+WORKDIR /app
 
-LABEL maintainer="micha.birklbauer@gmail.com"
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN mkdir app
-RUN mkdir app/.streamlit
-RUN mkdir app/.streamlit/ico
-COPY requirements.txt app
-COPY vsco.py app
-COPY streamlit_app.py app
-COPY .streamlit/config.toml app/.streamlit
-COPY .streamlit/ico/download-icon.png app/.streamlit/ico
-WORKDIR app
-RUN pip install -r requirements.txt
+# Copy application files
+COPY vsco.py .
+COPY api.py .
 
-CMD  ["streamlit", "run", "streamlit_app.py"]
+# Expose port
+EXPOSE 8000
+
+# Run the API server
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]

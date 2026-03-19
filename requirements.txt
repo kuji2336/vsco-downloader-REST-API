@@ -1,2 +1,6 @@
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+tls-client>=1.0.1
 streamlit
 tls-client
