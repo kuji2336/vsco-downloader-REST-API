@@ -30,6 +30,12 @@ def root():
     return {"message": "VSCO Downloader API", "version": "2.0.1"}
 
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for load balancers/proxies."""
+    return {"status": "ok", "version": "2.0.1"}
+
+
 @app.post("/extract", response_model=VscoUrlResponse)
 def extract_urls(request: VscoUrlRequest):
     """
