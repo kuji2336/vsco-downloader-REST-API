@@ -9,6 +9,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel, HttpUrl
 from typing import List
 from urllib.parse import urlparse
+import os
 from curl_cffi import requests as cffi_requests
 from vsco import get_links
 
@@ -100,11 +101,12 @@ ALLOWED_IMAGE_HOSTS = [
 
 
 @app.get("/download")
-def download_image(url: str):
+def download_image(url: str, proxy: str = None):
     """
     Download/proxy an image from VSCO's CDN using curl_cffi to bypass Cloudflare.
     
     - **url**: The direct VSCO image URL (e.g., https://im.vsco.co/...)
+    - **proxy**: Optional proxy URL (e.g., http://user:pass@host:port)
     
     Returns the raw image bytes with appropriate content type.
     """
@@ -114,7 +116,19 @@ def download_image(url: str):
             raise HTTPException(status_code=400, detail="Only VSCO image URLs are allowed")
         
         headers = {**IMAGE_REQUEST_HEADER, "Host": parsed.hostname}
-        response = cffi_requests.get(url, headers=headers, impersonate="chrome131", allow_redirects=True)
+        
+        # Use proxy if provided via query param or environment variable
+        proxy_url = proxy or os.environ.get("DOWNLOAD_PROXY_URL", "")
+        proxies = {"https": proxy_url, "http": proxy_url} if proxy_url else None
+        
+        response = cffi_requests.get(
+            url,
+            headers=headers,
+            impersonate="chrome131",
+            allow_redirects=True,
+            proxies=proxies,
+            timeout=30,
+        )
         
         if response.status_code != 200:
             raise HTTPException(
