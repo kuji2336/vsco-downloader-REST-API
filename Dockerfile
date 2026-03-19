@@ -13,8 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY vsco.py .
 COPY api.py .
 
-# Expose port (Coolify will use this)
-EXPOSE 8000
+# Expose port 3000 (Coolify default)
+EXPOSE 3000
 
-# Run the API server - bind to 0.0.0.0 is critical for Docker
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+# Run the API server on port 3000
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "3000", "--proxy-headers"]
