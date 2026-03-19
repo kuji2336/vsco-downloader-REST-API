@@ -9,7 +9,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel, HttpUrl
 from typing import List
 from urllib.parse import urlparse
-import tls_client
+from curl_cffi import requests as cffi_requests
 from vsco import get_links
 
 app = FastAPI(
@@ -113,9 +113,8 @@ def download_image(url: str):
         if parsed.hostname not in ALLOWED_IMAGE_HOSTS:
             raise HTTPException(status_code=400, detail="Only VSCO image URLs are allowed")
         
-        s = tls_client.Session(client_identifier="firefox_120")
         headers = {**IMAGE_REQUEST_HEADER, "Host": parsed.hostname}
-        response = s.get(url, headers=headers, allow_redirects=True)
+        response = cffi_requests.get(url, headers=headers, impersonate="chrome131", allow_redirects=True)
         
         if response.status_code != 200:
             raise HTTPException(
