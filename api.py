@@ -102,7 +102,7 @@ ALLOWED_IMAGE_HOSTS = [
 @app.get("/download")
 def download_image(url: str):
     """
-    Download/proxy an image from VSCO's CDN using tls_client to bypass Cloudflare.
+    Download/proxy an image from VSCO's CDN using curl_cffi to bypass Cloudflare.
     
     - **url**: The direct VSCO image URL (e.g., https://im.vsco.co/...)
     
